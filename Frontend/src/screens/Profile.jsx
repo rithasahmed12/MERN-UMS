@@ -1,34 +1,33 @@
-import Header from '../components/Header'
-import React, { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { useDispatch,useSelector } from 'react-redux'
-import {toast} from 'react-toastify'
-import { setCredentials } from '../slices/authSlice'
+import Header from "../components/Header";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
+import { setCredentials } from "../slices/authSlice";
+import EditProfileModal from "../components/EditProfileModal";
+import { useGetUserProfileQuery } from "../slices/usersApiSlice";
 
 const Profile = () => {
-    const [name, setName] = useState('') 
-    const [email, setEmail] = useState('') 
-    const [password, setPassword] = useState('') 
-    const [confirmPassword, setConfirmPassword] = useState('') 
+    
+  const [isEditProfileModalOpen, setIsEditProfileModalOpen] = useState(false);
 
-    const navigate = useNavigate();
-    const dispatch = useDispatch();
-  
-    const {userInfo} = useSelector((state)=> state.auth );
+  const {data:userData,error,isLoading} = useGetUserProfileQuery();
 
-    useEffect(()=> {
-        setName(userInfo.name)
-        setEmail(userInfo.email)
-    },[userInfo.setName, userInfo.setEmail])
+  const user = userData?.user;
 
-    const submitHandler = async (e) => {
-        e.preventDefault();
-        if(password !== confirmPassword){
-            toast.error("passwords do not match");
-        }else{
-            console.log('submit');
-        }
-    }
+
+  const handleEditProfileClick = () => {
+    setIsEditProfileModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsEditProfileModalOpen(false);
+  };
+
+
+  const { userInfo } = useSelector((state) => state.auth);
+
+
 
   return (
     <>
@@ -50,25 +49,25 @@ const Profile = () => {
                   fill="currentColor"
                 >
                   <path
-                    fill-rule="evenodd"
+                    fillRule="evenodd"
                     d="M6.293 9.293a1 1 0 0 1 0-1.414l3-3a1 1 0 1 1 1.414 1.414L9.414 8H17a1 1 0 1 1 0 2H9.414l1.293 1.293a1 1 0 1 1-1.414 1.414l-3-3a1 1 0 0 1 0-1.414z"
-                    clip-rule="evenodd"
+                    clipRule="evenodd"
                   />
                 </svg>
 
                 <span>Back</span>
               </Link>
-              <Link
-                to="/edit-profile"
+              <button
+                onClick={handleEditProfileClick}
                 className="flex items-center bg-white border hover:bg-teal-500 hover:text-white transition duration-500 border-gray-300 rounded-lg shadow-md px-6 py-2 text-sm font-medium text-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
               >
-                <span>Edit Profile</span>
-              </Link>
+                Edit Profile
+              </button>
             </div>
             <div className="max-w-md mx-auto">
               <div className="flex justify-center mb-4">
                 <img
-                  src="https://images.pexels.com/photos/1704488/pexels-photo-1704488.jpeg?cs=srgb&dl=pexels-suliman-sallehi-1704488.jpg&fm=jpg"
+                  src={user?.profileImage}
                   alt="Profile"
                   className="h-28 w-28 rounded-full"
                 />
@@ -85,7 +84,7 @@ const Profile = () => {
                     >
                       Username
                     </label>
-                    <p className="text-gray-900">{name}</p>
+                    <p className="text-gray-900">{userInfo.name}</p>
                   </div>
                   <div className="mb-4">
                     <label
@@ -94,7 +93,7 @@ const Profile = () => {
                     >
                       Email Address
                     </label>
-                    <p className="text-gray-900">{email}</p>
+                    <p className="text-gray-900">{userInfo.email}</p>
                   </div>
                   <div className="mb-4">
                     <label
@@ -114,9 +113,14 @@ const Profile = () => {
           </div>
         </div>
       </div>
-
+      {isEditProfileModalOpen && (
+        <EditProfileModal
+          isOpen={isEditProfileModalOpen}
+          onClose={handleCloseModal}
+        />
+      )}
     </>
-  )
-}
+  );
+};
 
-export default Profile
+export default Profile;

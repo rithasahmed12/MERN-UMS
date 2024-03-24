@@ -15,6 +15,10 @@ const userSchema = mongoose.Schema({
         type:String,
         required: true
     },
+    profileImage:{
+        type:String,
+        default:'https://images.pexels.com/photos/1704488/pexels-photo-1704488.jpeg?cs=srgb&dl=pexels-suliman-sallehi-1704488.jpg&fm=jpg'
+    }
 },{timestamps: true})
 
 userSchema.pre('save',async function (next){
