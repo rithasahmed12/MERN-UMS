@@ -1,5 +1,10 @@
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useDispatch,useSelector } from 'react-redux'
+import {toast} from 'react-toastify'
+import Loader from '../components/Loader'
+import { useRegisterMutation } from '../slices/usersApiSlice'
+import { setCredentials } from '../slices/authSlice'
 
 const Signup = () => {
   const [name, setName] = useState('') 
@@ -7,9 +12,32 @@ const Signup = () => {
   const [password, setPassword] = useState('') 
   const [confirmPassword, setConfirmPassword] = useState('') 
 
-  const submitHandler = (e)=>{
+  const {userInfo} = useSelector((state)=> state.auth );
+
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const [register, {isLoading}] = useRegisterMutation()
+
+  useEffect(()=>{
+    if(userInfo){
+      navigate('/home')
+    }
+  },[navigate,userInfo])
+
+  const submitHandler = async(e)=>{
     e.preventDefault();
-    console.log('sign up');
+    if(password !== confirmPassword){
+      toast.error('Passwords do not macth')
+    }else{
+      try {
+        const res = await register({name,email,password}).unwrap();
+        dispatch(setCredentials({...res}));
+        navigate('/home');
+      } catch (err) {
+        toast.error(err?.data?.message || err.error);
+      }
+    }
   }
 
   return (
@@ -45,7 +73,9 @@ const Signup = () => {
             </div>
           </div>
         </div>
-  
+
+        {isLoading && <Loader/>}
+
         <div className="w-full flex justify-center">
           <button className="flex items-center bg-white border hover:bg-teal-500 hover:text-white transition duration-500  border-gray-300 rounded-lg shadow-md px-6 py-2 text-sm font-medium text-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
             <span>Register</span>

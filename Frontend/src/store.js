@@ -5,10 +5,10 @@ import { apiSlice } from './slices/apiSlice';
 const store = configureStore({
     reducer:{
         auth:authReducer,
-        [apiSlice.reducerPath]: apiSlice.reducer.concat
-        (apiSlice.middleware),
+        [apiSlice.reducerPath]: apiSlice.reducer,
     },
-    middleware:(getDefaultMiddleware) => getDefaultMiddleware(),
+    middleware:(getDefaultMiddleware) => 
+    getDefaultMiddleware().concat(apiSlice.middleware),
     devTools:true, 
 })
 

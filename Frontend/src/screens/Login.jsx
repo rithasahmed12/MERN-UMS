@@ -1,13 +1,37 @@
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import React, { useState, useEffect } from 'react'
+import { Link , useNavigate} from 'react-router-dom'
+import {useDispatch, useSelector} from 'react-redux'
+import { useLoginMutation } from '../slices/usersApiSlice';
+import { setCredentials } from '../slices/authSlice';
+import { toast } from 'react-toastify';
+import Loader from '../components/Loader';
 
 const Login = () => {
   const [email,setEmail] = useState('');
   const [password,setPassword] = useState('');
 
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const [login, {isLoading}] = useLoginMutation();
+
+  const {userInfo} = useSelector((state)=> state.auth );
+
+  useEffect(()=>{
+    if(userInfo){
+      navigate('/home');
+    }
+  },[navigate,userInfo])
+
    const submitHandler = async(e) => {
       e.preventDefault();
-      console.log('submit');
+      try {
+        const res = await login({email,password}).unwrap();
+        dispatch(setCredentials({...res}))
+        navigate('/home')
+      } catch (err) {
+        toast.error(err?.data?.message || err.error);
+      }
    }
 
   return (
@@ -38,6 +62,7 @@ const Login = () => {
           </div>
         </div>
   
+          {isLoading && <Loader/>}
         <div className="w-full flex justify-center">
           <button type='submit' className="flex items-center bg-white border hover:bg-teal-500 hover:text-white transition duration-500  border-gray-300 rounded-lg shadow-md px-6 py-2 text-sm font-medium text-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
             <span>Login</span>
