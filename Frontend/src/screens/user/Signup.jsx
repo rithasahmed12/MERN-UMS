@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch,useSelector } from 'react-redux'
 import {toast} from 'react-toastify'
-import Loader from '../components/Loader'
-import { useRegisterMutation } from '../slices/usersApiSlice'
-import { setCredentials } from '../slices/authSlice'
+import Loader from '../../components/Loader'
+import { useRegisterMutation } from '../../slices/userSlice/usersApiSlice'
+import { setCredentials } from '../../slices/userSlice/authSlice'
 
 const Signup = () => {
   const [name, setName] = useState('') 

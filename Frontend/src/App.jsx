@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom"
-import Signup from "./screens/Signup"
+import Signup from "./screens/user/Signup"
 import Header from "./components/Header"
 import { ToastContainer } from "react-toastify"
 import 'react-toastify/dist/ReactToastify.css';

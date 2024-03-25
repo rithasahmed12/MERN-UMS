@@ -1,20 +1,12 @@
-import Header from "../components/Header";
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { toast } from "react-toastify";
-import { setCredentials } from "../slices/authSlice";
-import EditProfileModal from "../components/EditProfileModal";
-import { useGetUserProfileQuery } from "../slices/usersApiSlice";
+import Header from "../../components/Header";
+import React, { useState } from "react";
+import { Link} from "react-router-dom";
+import { useSelector } from "react-redux";
+import EditProfileModal from "../../components/EditProfileModal";
 
 const Profile = () => {
     
   const [isEditProfileModalOpen, setIsEditProfileModalOpen] = useState(false);
-
-  const {data:userData,error,isLoading} = useGetUserProfileQuery();
-
-  const user = userData?.user;
-
 
   const handleEditProfileClick = () => {
     setIsEditProfileModalOpen(true);
@@ -27,6 +19,7 @@ const Profile = () => {
 
   const { userInfo } = useSelector((state) => state.auth);
 
+  console.log('userInfo:',userInfo);
 
 
   return (
@@ -35,7 +28,6 @@ const Profile = () => {
 
       <div className="min-h-screen bg-gray-100 py-6 flex flex-col justify-center sm:py-12">
         <div className="relative py-3 sm:max-w-xl sm:mx-auto">
-          {/* <div className="absolute inset-0 bg-gradient-to-r from-teal-400 to-teal-600 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl"></div> */}
           <div className="relative px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-20">
             <div className="flex justify-between items-center mt-8">
               <Link
@@ -67,7 +59,7 @@ const Profile = () => {
             <div className="max-w-md mx-auto">
               <div className="flex justify-center mb-4">
                 <img
-                  src={user?.profileImage}
+                  src={userInfo.profileImage}
                   alt="Profile"
                   className="h-28 w-28 rounded-full"
                 />

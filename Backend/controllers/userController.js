@@ -2,6 +2,7 @@ import asyncHandler from "express-async-handler";
 import User from "../models/useModel.js";
 import generateToken from "../utils/generateToken.js";
 import bcrypt from 'bcryptjs';
+import cloudinary from "../utils/cloudinary.js";
 
 // @desc Auth user/set token
 // route POST/api/users/auth
@@ -17,7 +18,9 @@ const authUser = asyncHandler(async(req,res)=>{
         res.status(201).json({
             _id:user._id,
             name:user.name,
-            email:user.email
+            email:user.email,
+            profileImage:user.profileImage,
+
         })
     }else{
         res.status(401);
@@ -49,7 +52,9 @@ const registerUser = asyncHandler(async(req,res)=>{
         res.status(201).json({
             _id:user._id,
             name:user.name,
-            email:user.email
+            email:user.email,
+            profileImage:user.profileImage,
+            
         })
     }else{
         res.status(400);
@@ -92,10 +97,19 @@ const getUserProfile = asyncHandler(async(req,res)=>{
 
 const updateUserProfile = asyncHandler(async(req,res)=>{
    const user = await User.findById(req.user._id);
-   console.log(req.body);
-   console.log(req.file);
-   
+
    if(user){
+
+    if (req.file) {
+        try {
+            const result = await cloudinary.uploader.upload(req.file.path);
+            user.profileImage = result.secure_url;
+        } catch (error) {
+            console.error('Cloudinary upload error:', error);
+            return res.status(400).json({ error: 'Failed to upload image to Cloudinary' });
+        }
+    }
+
     user.name = req.body.name || user.name;
     user.email = req.body.email || user.email;
 
@@ -109,12 +123,15 @@ const updateUserProfile = asyncHandler(async(req,res)=>{
         user.password = req.body.password;
     }
 
+  
+
     const updatedUser = await user.save()
 
     res.status(200).json({
        _id: updatedUser._id,
        name:updatedUser.name,
        email:updatedUser.email,
+       profileImage:updatedUser.profileImage,
     });
     
 

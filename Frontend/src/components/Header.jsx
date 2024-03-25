@@ -1,8 +1,8 @@
 import React from 'react';
 import {FaSignOutAlt, FaUser} from 'react-icons/fa'
 import { Link, useNavigate } from 'react-router-dom';
-import { useLogoutMutation } from '../slices/usersApiSlice';
-import { logout } from '../slices/authSlice';
+import { useLogoutMutation } from '../slices/userSlice/usersApiSlice';
+import { logout } from '../slices/userSlice/authSlice';
 import { useDispatch } from 'react-redux';
 
 const Header = () => {
