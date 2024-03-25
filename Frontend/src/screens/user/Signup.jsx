@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch,useSelector } from 'react-redux'
 import {toast} from 'react-toastify'
-import Loader from '../../components/Loader'
+import Loader from '../../components/userComponents/Loader'
 import { useRegisterMutation } from '../../slices/userSlice/usersApiSlice'
 import { setCredentials } from '../../slices/userSlice/authSlice'
 

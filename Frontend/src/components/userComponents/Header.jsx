@@ -1,8 +1,8 @@
 import React from 'react';
 import {FaSignOutAlt, FaUser} from 'react-icons/fa'
 import { Link, useNavigate } from 'react-router-dom';
-import { useLogoutMutation } from '../slices/userSlice/usersApiSlice';
-import { logout } from '../slices/userSlice/authSlice';
+import { useLogoutMutation } from '../../slices/userSlice/usersApiSlice';
+import { logout } from '../../slices/userSlice/authSlice';
 import { useDispatch } from 'react-redux';
 
 const Header = () => {
@@ -16,7 +16,6 @@ const Header = () => {
     try {
       await logoutApiCall().unwrap();
       dispatch(logout());
-      console.log('reachedhere');
       navigate('/');  
     } catch (error) {
       console.log(error);

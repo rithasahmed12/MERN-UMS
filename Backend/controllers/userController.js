@@ -14,7 +14,7 @@ const authUser = asyncHandler(async(req,res)=>{
     const user = await User.findOne({email});
     
     if(user && (await user.matchPassword(password))){
-        generateToken(res,user._id);
+        generateToken(res,user._id,'userJwt');
         res.status(201).json({
             _id:user._id,
             name:user.name,
@@ -69,7 +69,7 @@ const registerUser = asyncHandler(async(req,res)=>{
 // @access Public
 
 const logoutUser = asyncHandler(async(req,res)=>{
-    res.cookie('jwt','',{
+    res.cookie('userJwt','',{
         httpOnly:true,
         expires:new Date(0),
     })
@@ -96,6 +96,7 @@ const getUserProfile = asyncHandler(async(req,res)=>{
 // @access Public
 
 const updateUserProfile = asyncHandler(async(req,res)=>{
+    console.log(req.body ,'\n', req.file);
    const user = await User.findById(req.user._id);
 
    if(user){

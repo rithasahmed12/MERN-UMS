@@ -1,6 +1,6 @@
 import React from 'react'
-import Header from '../../components/Header'
-import HomeBody from '../../components/HomeBody'
+import Header from '../../components/userComponents/Header'
+import HomeBody from '../../components/userComponents/HomeBody'
 const Home = () => {
   return (
     <>

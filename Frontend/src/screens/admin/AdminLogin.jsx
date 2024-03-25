@@ -1,51 +1,56 @@
 import React, { useState, useEffect } from 'react'
-import { Link , useNavigate} from 'react-router-dom'
+import { useNavigate} from 'react-router-dom'
 import {useDispatch, useSelector} from 'react-redux'
-import { useLoginMutation } from '../../slices/userSlice/usersApiSlice';
-import { setCredentials } from '../../slices/userSlice/authSlice';
-import { toast } from 'react-toastify';
-import Loader from '../../components/userComponents/Loader';
+import { useAdminLoginMutation } from '../../slices/adminSlice/adminApliSlice';
+import { setAdminCredentials } from '../../slices/adminSlice/adminAuthSlice'
+import {toast} from 'react-toastify'
+import Loader from '../../components/adminComponents/Loader.jsx';
 
-const Login = () => {
-  const [email,setEmail] = useState('');
-  const [password,setPassword] = useState('');
 
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-
-  const [login, {isLoading}] = useLoginMutation();
-
-  const {userInfo} = useSelector((state)=> state.auth );
-
-  useEffect(()=>{
-    if(userInfo){
-      navigate('/home');
-    }
-  },[navigate,userInfo])
-
-   const submitHandler = async(e) => {
-      e.preventDefault();
-      try {
-        const res = await login({email,password}).unwrap();
-        dispatch(setCredentials({...res}))
-        navigate('/home')
-      } catch (err) {
-        toast.error(err?.data?.message || err.error);
+const AdminLogin = () => {
+    const [email,setEmail] = useState('');
+    const [password,setPassword] = useState('');
+  
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+  
+    const [adminLogin, {isLoading}] = useAdminLoginMutation();
+  
+    const {adminInfo} = useSelector((state)=> state.adminAuth );
+  
+    useEffect(()=>{
+      if(adminInfo){
+        navigate('/admin/home');
       }
-   }
+    },[navigate,adminInfo])
+
+  
+     const submitHandler = async(e) => {
+        e.preventDefault();
+        try {
+
+          const res = await adminLogin({email,password}).unwrap();
+          dispatch(setAdminCredentials({...res}));
+          navigate('/admin/home')
+        
+        } catch (err) {
+          console.log(err?.data?.message);
+          toast.error(err?.data?.message || err.error);
+        }
+     }
 
   return (
     <div className="min-h-screen bg-gray-100 py-6 flex flex-col justify-center sm:py-12">
     <div className="relative py-3 sm:max-w-xl sm:mx-auto">
       <div
-        className="absolute inset-0 bg-gradient-to-r from-teal-400 to-teal-600 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl">
+        className="absolute inset-0 bg-gradient-to-r from-indigo-400 to-indigo-600 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl">
       </div>
       <div className="relative px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-20">
   
         <form onSubmit={submitHandler}>
         <div className="max-w-md mx-auto">
           <div>
-            <h1 className="text-2xl font-semibold">Login</h1>
+            <h1 className="text-2xl font-semibold text-center mb-3">Admin Login</h1>
           </div>
           <div className="divide-y divide-gray-200">
             <div className="py-8 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7">
@@ -64,19 +69,14 @@ const Login = () => {
   
           {isLoading && <Loader/>}
         <div className="w-full flex justify-center">
-          <button type='submit' className="flex items-center bg-white border hover:bg-teal-500 hover:text-white transition duration-500  border-gray-300 rounded-lg shadow-md px-6 py-2 text-sm font-medium text-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+          <button type='submit' className="flex items-center bg-white border hover:bg-indigo-500 hover:text-white transition duration-500  border-gray-300 rounded-lg shadow-md px-6 py-2 text-sm font-medium text-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
             <span>Login</span>
           </button>
           
         </div>
               </form>
          
-        <div className='text-sm mt-5 text-center'>
-        <span className='me-2'>Not registered?</span>
-        <Link to='/signup' >
-        <span className='text-teal-500 hover:text-teal-700 cursor-pointer'>Signup</span>
-        </Link>
-        </div>
+       
   
       </div>
     </div>
@@ -84,4 +84,4 @@ const Login = () => {
   )
 }
 
-export default Login
+export default AdminLogin

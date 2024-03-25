@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch,useSelector } from 'react-redux';
 import {toast} from 'react-toastify';
-import { setCredentials } from '../slices/userSlice/authSlice';
-import { useUpdateUserMutation } from '../slices/userSlice/usersApiSlice';
+import { setCredentials } from '../../slices/userSlice/authSlice';
+import { useUpdateUserMutation } from '../../slices/userSlice/usersApiSlice';
 import Loader from './Loader';
 
 const EditProfileModal = ({ isOpen, onClose }) => {

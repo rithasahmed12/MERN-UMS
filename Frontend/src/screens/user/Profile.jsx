@@ -1,8 +1,8 @@
-import Header from "../../components/Header";
+import Header from "../../components/userComponents/Header";
 import React, { useState } from "react";
 import { Link} from "react-router-dom";
 import { useSelector } from "react-redux";
-import EditProfileModal from "../../components/EditProfileModal";
+import EditProfileModal from "../../components/userComponents/EditProfileModal";
 
 const Profile = () => {
     
