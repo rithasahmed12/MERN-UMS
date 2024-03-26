@@ -1,58 +1,45 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {toast} from 'react-toastify';
-import { useUpdateUserDetailsMutation } from '../../slices/adminSlice/adminApliSlice';
+import { useAddNewUserMutation } from '../../slices/adminSlice/adminApliSlice';
 import Loader from './Loader';
 
-const EditUsersModal = ({userData,isOpen, onClose}) => {
+
+
+const AddUserModal = ({isOpen,onClose}) => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
-    const [image , setImage] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [selectedImage, setSelectedImage] = useState('');
 
-    const [updateProfileDetails, {isLoading}] = useUpdateUserDetailsMutation()
+    const [addNewUser, {isLoading}] = useAddNewUserMutation()
     
-
-    useEffect(()=>{
-        setName(userData.name);
-        setEmail(userData.email);
-        setImage(userData.profileImage);
-    },[])
-
 
     const handleImageChange = (e)=>{
         const files = e.target.files[0];
         setSelectedImage(files);
     }
 
-    const handleSave = async (e) => {
-        console.log('hahhahahaha');
+    const handleSave = async(e)=>{
         e.preventDefault();
-        if (password !== confirmPassword) {
-            toast.error('Passwords do not match');
-            return;
+        if(password !== confirmPassword){
+            toast.error('Passwords do not match')
+        }else{
+            try {
+                const formData = new FormData();
+                formData.append('name', name);
+                formData.append('email', email);
+                formData.append('password', password);
+                formData.append('image', selectedImage);
+                await addNewUser(formData).unwrap();
+                toast.success('Added new user')
+                onClose();
+
+            } catch (error) {
+                toast.error(error?.data?.message||err.message);
+            }
         }
-    
-        try {
-            const formData = new FormData();
-            formData.append('_id', userData._id);
-            formData.append('name', name);
-            formData.append('email', email);
-            formData.append('password', password);
-            formData.append('image', selectedImage);
-            const res = await updateProfileDetails(formData).unwrap();
-          
-            toast.success('Profile updated');
-           
-            onClose();
-        } catch (err) {
-            toast.error(err?.data?.message||err.message);
-        }
-    };
-
-
-
+    }
   
   return (
     <div className={`fixed z-10 inset-0 overflow-y-auto ${isOpen ? '' : 'hidden'}`}>
@@ -69,8 +56,7 @@ const EditUsersModal = ({userData,isOpen, onClose}) => {
           <div className="sm:flex sm:items-start">
             <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
               <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">Edit Profile</h3>
-                {selectedImage ? (<img src={URL.createObjectURL(selectedImage)} className='h-28 w-28 rounded-full' alt="Selected" />) :
-                    ( <img src={image} alt="" className='h-28 w-28 rounded-full' /> ) }
+                {selectedImage && <img src={URL.createObjectURL(selectedImage)} className='h-28 w-28 rounded-full' alt="Selected" /> }
               <div className="mb-4">
                 <label htmlFor="profileImage" className="block text-sm font-medium text-gray-700">Profile Image</label>
                 <input type="file" onChange={handleImageChange} accept="image/*" name='image' className="mt-1 mb-2 block w-full shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md" />
@@ -112,4 +98,4 @@ const EditUsersModal = ({userData,isOpen, onClose}) => {
   )
 }
 
-export default EditUsersModal
+export default AddUserModal

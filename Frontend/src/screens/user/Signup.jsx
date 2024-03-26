@@ -28,7 +28,7 @@ const Signup = () => {
   const submitHandler = async(e)=>{
     e.preventDefault();
     if(password !== confirmPassword){
-      toast.error('Passwords do not macth')
+      toast.error('Passwords do not match')
     }else{
       try {
         const res = await register({name,email,password}).unwrap();

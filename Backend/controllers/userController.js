@@ -4,9 +4,7 @@ import generateToken from "../utils/generateToken.js";
 import bcrypt from 'bcryptjs';
 import cloudinary from "../utils/cloudinary.js";
 
-// @desc Auth user/set token
-// route POST/api/users/auth
-// @access Public
+
 
 const authUser = asyncHandler(async(req,res)=>{
     const {email,password} = req.body;
@@ -27,9 +25,7 @@ const authUser = asyncHandler(async(req,res)=>{
         throw new Error('Invalid email or password');
     }
 })
-// @desc Register a new user
-// route POST/api/users
-// @access Public
+
 
 const registerUser = asyncHandler(async(req,res)=>{
     const {name,email,password} = req.body;
@@ -64,9 +60,7 @@ const registerUser = asyncHandler(async(req,res)=>{
    
 })
 
-// @desc Logout User
-// route POST/api/users/logout
-// @access Public
+
 
 const logoutUser = asyncHandler(async(req,res)=>{
     res.cookie('userJwt','',{
@@ -77,9 +71,7 @@ const logoutUser = asyncHandler(async(req,res)=>{
     res.status(200).json({message:"Logout User"});
 })
 
-// @desc get user profile
-// route GET/api/users/profile
-// @access Private
+
 
 const getUserProfile = asyncHandler(async(req,res)=>{
     const user = {
@@ -91,15 +83,22 @@ const getUserProfile = asyncHandler(async(req,res)=>{
     res.status(200).json({user});
 })
 
-// @desc update user profile
-// route PUT/api/users/profile
-// @access Public
+
 
 const updateUserProfile = asyncHandler(async(req,res)=>{
     
    const user = await User.findById(req.user._id);
 
    if(user){
+    if (user.profileImage) {
+        const publicIdMatch = user.profileImage.match(/\/upload\/v\d+\/([^./]+)\./);
+        if (publicIdMatch && publicIdMatch[1]) {
+            const publicId = publicIdMatch[1];
+            await cloudinary.uploader.destroy(publicId);
+        } else {
+            console.log('No public_id found in profileImage URL');
+        }
+    }
 
     if (req.file) {
         try {

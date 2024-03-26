@@ -3,8 +3,9 @@ import User from "../models/useModel.js";
 import generateToken from "../utils/generateToken.js";
 import cloudinary from '../utils/cloudinary.js'
 
+
+
 const authAdmin = asyncHandler(async(req,res)=>{
-    console.log(req.body);
     const {email,password} = req.body;
 
     const admin = await User.findOne({email});
@@ -24,6 +25,8 @@ const authAdmin = asyncHandler(async(req,res)=>{
     }
 })
 
+
+
 const adminLogout=asyncHandler(async(req,res)=>{
 
 
@@ -36,16 +39,28 @@ const adminLogout=asyncHandler(async(req,res)=>{
    
    })
 
+
+
 const getUsers = asyncHandler(async(req,res)=>{
     const userData = await User.find({ isAdmin: { $ne: true } }).select('-password').sort({updatedAt:-1});
     res.status(200).json(userData);
    })
 
+
+
 const updateUserDetail = asyncHandler(async(req,res)=>{
-    console.log(req.body);
-    console.log(req.file);
     const user = await User.findById(req.body._id);
     if(user){
+
+        if (user.profileImage) {
+            const publicIdMatch = user.profileImage.match(/\/upload\/v\d+\/([^./]+)\./);
+            if (publicIdMatch && publicIdMatch[1]) {
+                const publicId = publicIdMatch[1];
+                await cloudinary.uploader.destroy(publicId);
+            } else {
+                console.log('No public_id found in profileImage URL');
+            }
+        }
 
         if (req.file) {
             try {
@@ -56,6 +71,8 @@ const updateUserDetail = asyncHandler(async(req,res)=>{
                 return res.status(400).json({ error: 'Failed to upload image to Cloudinary' });
             }
         }
+
+     
     
         user.name = req.body.name || user.name;
         user.email = req.body.email || user.email;
@@ -75,11 +92,73 @@ const updateUserDetail = asyncHandler(async(req,res)=>{
         res.status(404);
         throw new Error('User not found')
        }
-})   
+});
+
+
+
+const addNewUser = asyncHandler(async(req,res)=>{
+    const {name,email,password} = req.body;
+
+    let imageUrl='https://img.freepik.com/premium-vector/young-man-face-avater-vector-illustration-design_968209-13.jpg'
+
+    const userExists = await User.findOne({email});
+
+    if(userExists){
+        res.status(400);
+        throw new Error('user already exists');
+    }
+
+    if(req.file){
+        const result = await cloudinary.uploader.upload(req.file.path);
+        imageUrl = result.secure_url || null;
+    }
+
+    const user = await User.create({name,email,password,profileImage:imageUrl})
+
+    if(user){
+       res.status(201).json({
+        _id:user._id,
+        name:user.name,
+        email:user.email,
+        profileImage:user.profileImage,
+       }) 
+    }else{
+        res.status(400);
+        throw new Error('Invalid user data');
+    }
+})
+
+const deleteUser = asyncHandler(async (req, res) => {
+    console.log(req.body);
+    const { userId } = req.body;
+
+    const user = await User.findOne({_id:userId});
+    if (!user) {
+        res.status(404);
+        throw new Error('User not found');
+    }
+
+
+    if (user.profileImage) {
+        const publicIdMatch = user.profileImage.match(/\/upload\/v\d+\/([^./]+)\./);
+        if (publicIdMatch && publicIdMatch[1]) {
+            const publicId = publicIdMatch[1];
+            await cloudinary.uploader.destroy(publicId);
+        } else {
+            console.log('No public_id found in profileImage URL');
+        }
+    }
+    await User.deleteOne({ _id: userId });
+
+    res.status(200).json({ message: 'User deleted' });
+});
+
 
 export {
     authAdmin,
     adminLogout,
     getUsers,
-    updateUserDetail
+    updateUserDetail,
+    addNewUser,
+    deleteUser
    }

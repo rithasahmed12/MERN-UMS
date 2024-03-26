@@ -1,9 +1,14 @@
 import { useState, useEffect } from "react";
 import HeaderAdmin from "../../components/adminComponents/HeaderAdmin";
 import { Link } from "react-router-dom";
-import { useGetUsersMutation } from "../../slices/adminSlice/adminApliSlice";
+import { useGetUsersMutation, useDeleteUserMutation } from "../../slices/adminSlice/adminApliSlice";
 import { toast } from "react-toastify";
 import EditUsersModal from "../../components/adminComponents/EditUsersModal";
+import AddUserModal from "../../components/adminComponents/AddUserModal";
+import Loader from "../../components/adminComponents/Loader";
+import Swal from 'sweetalert2';
+import 'sweetalert2/dist/sweetalert2.css';
+
 
 const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
@@ -12,7 +17,9 @@ const AdminDashboard = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [usersPerPage] = useState(5);
   const [isEditUsersModalOpen, setIsEditUsersModalOpen] = useState(false);
+  const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [existingUser, setExistingUser] = useState(users.length);
 
   const handleEditProfileClick = (user) => {
     setSelectedUser(user)
@@ -21,11 +28,18 @@ const AdminDashboard = () => {
 
   const handleCloseModal = () => {
     setIsEditUsersModalOpen(false);
+    setIsAddUserModalOpen(false);
     setSelectedUser(null)
   };
 
+  const handleAddUserClick = () =>{
+    setIsAddUserModalOpen(true);
+  }
+
+
   const [getUsers, { isLoading }] = useGetUsersMutation();
 
+  const [deleteusers,{removeLoading}] = useDeleteUserMutation();
 
 
   // useEffect to fetch user initiallly
@@ -40,7 +54,7 @@ const AdminDashboard = () => {
     };
 
     fetchData();
-  }, [isEditUsersModalOpen]);
+  }, [isEditUsersModalOpen,isAddUserModalOpen,existingUser]);
 
 
 
@@ -54,7 +68,7 @@ const AdminDashboard = () => {
   // pagination logic
   // calculate index of last user on the page
   const indexOfLastUser = currentPage * usersPerPage;
-  // calculate index of last user on the page
+  // calculate index of first user on the page
   const indexOfFistUser = indexOfLastUser - usersPerPage;
   // get current page of users
   const currentUsers = filteredUsers.slice(indexOfFistUser, indexOfLastUser);
@@ -81,6 +95,37 @@ const AdminDashboard = () => {
       setCurrentPage((prev) => prev + 1);
     }
   };
+
+  const handleDeleteUser = async(userId) => {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'You will not be able to recover this user!',
+      icon: 'warning',
+      iconColor: '#3F51B5',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3F51B5',
+      confirmButtonText: 'Yes, delete it!',
+    }).then(async(result) => {
+      if (result.isConfirmed) {
+        try {
+          const res = await deleteusers({userId:userId}).unwrap();
+          if(res){
+            setExistingUser(prevState => prevState - 1);
+            toast.success('user removed successfully')
+          }
+        } catch (error) {
+          toast.error(error?.data?.message || error.message)
+        }
+      }
+    });
+  };
+
+  const deleteUserData = (userId) => {
+    setUsers(users => users.filter(user => user.userId !== userId));
+};
+  
+
 
   return (
     <>
@@ -170,7 +215,9 @@ const AdminDashboard = () => {
                             Edit
                           </button>
                           <span className="text-gray-300 mx-2">|</span>
-                          <button className="text-red-600 hover:text-red-900">
+                          <button
+                          onClick={() => handleDeleteUser(user._id)} 
+                          className="text-red-600 hover:text-red-900">
                             Delete
                           </button>
                         </td>
@@ -190,12 +237,15 @@ const AdminDashboard = () => {
               </table>
             </div>
             <div className="mt-6 w-full flex justify-center">
-              <Link to="/admin/add-user">
-                <button className="flex items-center bg-white border hover:bg-indigo-500 hover:text-white transition duration-500 border-gray-300 rounded-lg shadow-md px-6 py-2 text-sm font-medium text-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+              
+                <button
+                onClick={handleAddUserClick}
+                className="flex items-center bg-white border hover:bg-indigo-500 hover:text-white transition duration-500 border-gray-300 rounded-lg shadow-md px-6 py-2 text-sm font-medium text-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
                   <span>Add User</span>
                 </button>
-              </Link>
+              
             </div>
+            {(isLoading || removeLoading) && <Loader/>}
             {/* Pagination controls */}
             <div className="flex justify-between mt-4">
               <button
@@ -232,6 +282,13 @@ const AdminDashboard = () => {
           onClose={handleCloseModal}
         />
       )}  
+      {isAddUserModalOpen && (
+        <AddUserModal
+          isOpen={isAddUserModalOpen}
+          onClose={handleCloseModal}
+        />
+      )}  
+
     </>
   );
 };
