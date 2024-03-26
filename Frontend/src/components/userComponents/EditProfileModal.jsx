@@ -31,6 +31,23 @@ const EditProfileModal = ({ isOpen, onClose }) => {
 
   const handleSave = async (e) => {
     e.preventDefault();
+    const isEmailValid = /^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/.test(email);
+    const isNameValid = /^[a-zA-Z _-]{3,16}$/.test(name);
+    let errors = {};
+
+    if (!isNameValid || name.trim()=='') {
+        errors.name = 'Please Enter a valid name'
+    }
+    if (!isEmailValid || email.trim()=='') {
+        errors.email = 'Please Enter a valid email';
+    }
+
+  if(Object.keys(errors).length > 0){
+      toast.error(errors.name);
+      toast.error(errors.email);
+      return;
+  }
+
     if (newPassword !== confirmPassword) {
         toast.error('Passwords do not match');
         return;

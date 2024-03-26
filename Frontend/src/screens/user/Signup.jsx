@@ -5,6 +5,7 @@ import {toast} from 'react-toastify'
 import Loader from '../../components/userComponents/Loader'
 import { useRegisterMutation } from '../../slices/userSlice/usersApiSlice'
 import { setCredentials } from '../../slices/userSlice/authSlice'
+import { validateSignupForm } from '../../validation.js'
 
 const Signup = () => {
   const [name, setName] = useState('') 
@@ -27,6 +28,16 @@ const Signup = () => {
 
   const submitHandler = async(e)=>{
     e.preventDefault();
+       
+    const formErrors = validateSignupForm(name,email,password);
+    if (Object.keys(formErrors).length > 0) {
+      console.log(formErrors);
+      toast.error(formErrors.name);
+      toast.error(formErrors.email);
+      toast.error(formErrors.password)
+      return;
+    }
+
     if(password !== confirmPassword){
       toast.error('Passwords do not match')
     }else{

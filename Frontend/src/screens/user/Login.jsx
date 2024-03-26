@@ -5,6 +5,7 @@ import { useLoginMutation } from '../../slices/userSlice/usersApiSlice';
 import { setCredentials } from '../../slices/userSlice/authSlice';
 import { toast } from 'react-toastify';
 import Loader from '../../components/userComponents/Loader';
+import { validateLoginForm } from '../../validation';
 
 const Login = () => {
   const [email,setEmail] = useState('');
@@ -25,6 +26,13 @@ const Login = () => {
 
    const submitHandler = async(e) => {
       e.preventDefault();
+      const formErrors = validateLoginForm(email, password);
+        
+      if (Object.keys(formErrors).length > 0) {
+        toast.error(formErrors.email);
+        toast.error(formErrors.password)
+        return;
+      }
       try {
         const res = await login({email,password}).unwrap();
         dispatch(setCredentials({...res}))

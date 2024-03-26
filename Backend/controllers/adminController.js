@@ -129,7 +129,6 @@ const addNewUser = asyncHandler(async(req,res)=>{
 })
 
 const deleteUser = asyncHandler(async (req, res) => {
-    console.log(req.body);
     const { userId } = req.body;
 
     const user = await User.findOne({_id:userId});

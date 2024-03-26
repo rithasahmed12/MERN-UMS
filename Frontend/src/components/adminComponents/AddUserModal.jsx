@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import {toast} from 'react-toastify';
 import { useAddNewUserMutation } from '../../slices/adminSlice/adminApliSlice';
 import Loader from './Loader';
-
+import { validateSignupForm } from '../../validation';
 
 
 const AddUserModal = ({isOpen,onClose}) => {
@@ -22,6 +22,14 @@ const AddUserModal = ({isOpen,onClose}) => {
 
     const handleSave = async(e)=>{
         e.preventDefault();
+        const formErrors = validateSignupForm(name,email,password);
+        if (Object.keys(formErrors).length > 0) {
+          console.log(formErrors);
+          toast.error(formErrors.name);
+          toast.error(formErrors.email);
+          toast.error(formErrors.password)
+          return;
+        }
         if(password !== confirmPassword){
             toast.error('Passwords do not match')
         }else{
