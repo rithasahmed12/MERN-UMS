@@ -96,7 +96,7 @@ const getUserProfile = asyncHandler(async(req,res)=>{
 // @access Public
 
 const updateUserProfile = asyncHandler(async(req,res)=>{
-    console.log(req.body ,'\n', req.file);
+    
    const user = await User.findById(req.user._id);
 
    if(user){
