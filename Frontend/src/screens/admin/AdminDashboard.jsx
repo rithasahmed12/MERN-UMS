@@ -19,7 +19,7 @@ const AdminDashboard = () => {
   const [isEditUsersModalOpen, setIsEditUsersModalOpen] = useState(false);
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [existingUser, setExistingUser] = useState(users.length);
+  const [existingUser, setExistingUser] = useState(users?.length || 0);
 
   const handleEditProfileClick = (user) => {
     setSelectedUser(user)
@@ -71,7 +71,7 @@ const AdminDashboard = () => {
   // calculate index of first user on the page
   const indexOfFistUser = indexOfLastUser - usersPerPage;
   // get current page of users
-  const currentUsers = filteredUsers.slice(indexOfFistUser, indexOfLastUser);
+  const currentUsers = filteredUsers?.slice(indexOfFistUser, indexOfLastUser);
 
   function filteredData(searchText, userList) {
     if (searchText == "") {
@@ -91,7 +91,7 @@ const AdminDashboard = () => {
   const handlePagination = (action) => {
     if (action === "prev" && currentPage > 1) {
       setCurrentPage((prev) => prev - 1);
-    } else if (action === "next" && indexOfLastUser < filteredUsers.length) {
+    } else if (action === "next" && indexOfLastUser < filteredUsers?.length) {
       setCurrentPage((prev) => prev + 1);
     }
   };
@@ -191,7 +191,7 @@ const AdminDashboard = () => {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredUsers.length > 0 ? (
+                  {filteredUsers?.length > 0 ? (
                     currentUsers.map((user) => (
                       <tr key={user._id}>
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -262,9 +262,9 @@ const AdminDashboard = () => {
               <span className="px-4 py-2">{currentPage}</span>
               <button
                 onClick={() => handlePagination("next")}
-                disabled={indexOfLastUser >= filteredUsers.length}
+                disabled={indexOfLastUser >= filteredUsers?.length}
                 className={`px-4 py-2 bg-gray-200 rounded-lg ${
-                  indexOfLastUser >= filteredUsers.length
+                  indexOfLastUser >= filteredUsers?.length
                     ? "opacity-50 cursor-not-allowed"
                     : "hover:bg-gray-300"
                 }`}
